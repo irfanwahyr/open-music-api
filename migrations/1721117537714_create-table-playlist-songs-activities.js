@@ -37,7 +37,7 @@ exports.up = (pgm) => {
     },
   });
 
-  pgm.addConstraint('playlist_song_activities', 'fk_playlist_song_activities.playlists_id_playlists.id', {
+  pgm.addConstraint('playlist_song_activities', 'fk_playlist_song_activities.playlist_id_playlists.id', {
     foreignKeys: {
       columns: 'playlist_id',
       references: 'playlists(id)',
@@ -68,8 +68,8 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  pgm.dropConstraint('playlists', 'fk_playlist_song_activities.playlists_id_playlists.id');
-  pgm.dropConstraint('playlists', 'fk_playlist_song_activities.song_id_songs.id');
-  pgm.dropConstraint('playlists', 'fk_playlist_song_activities.user_id_users.id');
+  pgm.dropConstraint('playlist_song_activities', 'fk_playlist_song_activities.playlist_id_playlists.id');
+  pgm.dropConstraint('playlist_song_activities', 'fk_playlist_song_activities.song_id_songs.id');
+  pgm.dropConstraint('playlist_song_activities', 'fk_playlist_song_activities.user_id_users.id');
   pgm.dropTable('playlist_song_activities');
 };
