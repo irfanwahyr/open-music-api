@@ -10,7 +10,7 @@ class CollaborationsService {
     this._pool = new Pool();
   }
 
-  async verifyPlaylistOwner(id, owner) {
+  async verifyCollaborationOwner(id, credentialId) {
     const query = {
       text: 'SELECT * FROM playlists WHERE id = $1',
       values: [id],
@@ -23,7 +23,7 @@ class CollaborationsService {
 
     const playlist = result.rows[0];
 
-    if (playlist.owner !== owner) {
+    if (playlist.owner !== credentialId) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
   }
@@ -46,7 +46,7 @@ class CollaborationsService {
     };
 
     const result = await this._pool.query(query);
-    if (!result.rows[0].id) {
+    if (!result.rows.length) {
       throw new InvariantError('Kolaborasi gagal ditambahkan');
     }
 

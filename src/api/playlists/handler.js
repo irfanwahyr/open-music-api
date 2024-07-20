@@ -31,7 +31,10 @@ class PlaylistsHandler {
     const { id } = request.params;
     const { songId } = request.payload;
     const { id: credentialId } = request.auth.credentials;
-    await this._service.verifyPlaylistOwner(id, credentialId);
+    const colab = await this._service.verifyPlaylistColab(id, credentialId);
+    if (!colab) {
+      await this._service.verifyPlaylistOwner(id, credentialId);
+    }
     await this._service.addSongToPlaylist(id, songId, credentialId);
 
     await this._service.addPlaylistActivities(id, songId, credentialId, 'add', new Date());
@@ -60,7 +63,10 @@ class PlaylistsHandler {
   async getPlaylistSongByIdHandler(request) {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
-    await this._service.verifyPlaylistOwner(id, credentialId);
+    const colab = await this._service.verifyPlaylistColab(id, credentialId);
+    if (!colab) {
+      await this._service.verifyPlaylistOwner(id, credentialId);
+    }
     const playlist = await this._service.getSongsFromPlaylist(id);
 
     return {
@@ -100,7 +106,10 @@ class PlaylistsHandler {
     const { id: credentialId } = request.auth.credentials;
     const { songId } = request.payload;
     const { id } = request.params;
-    await this._service.verifyPlaylistOwner(id, credentialId);
+    const colab = await this._service.verifyPlaylistColab(id, credentialId);
+    if (!colab) {
+      await this._service.verifyPlaylistOwner(id, credentialId);
+    }
     this._validator.validatePlaylistSongsPayload(request.payload);
     await this._service.deleteSongFromPlaylist(songId);
 
@@ -115,7 +124,10 @@ class PlaylistsHandler {
   async getPlaylistActivitiesHandler(request) {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
-    await this._service.verifyPlaylistOwner(id, credentialId);
+    const colab = await this._service.verifyPlaylistColab(id, credentialId);
+    if (!colab) {
+      await this._service.verifyPlaylistOwner(id, credentialId);
+    }
     const activities = await this._service.getPlaylistActivities(id);
 
     return {

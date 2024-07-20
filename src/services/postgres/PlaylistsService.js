@@ -28,6 +28,26 @@ class PlaylistsService {
     }
   }
 
+  async verifyPlaylistColab(id, owner) {
+    const query = {
+      text: 'SELECT * FROM collaborations WHERE playlist_id = $1',
+      values: [id],
+    };
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      return false;
+    }
+
+    const playlist = result.rows[0];
+
+    if (playlist.user_id === owner) {
+      return true;
+    }
+
+    return false;
+  }
+
   async addPlaylist({ name, owner }) {
     const id = nanoid(16);
 
@@ -63,8 +83,9 @@ class PlaylistsService {
 
     const queryCollaborations = {
       text: `
-        SELECT p.id, p.name, p.owner
+        SELECT p.id AS id, p.name AS name, u.username AS username
         FROM playlists p
+        JOIN users u ON p.owner = u.id
         JOIN collaborations c ON p.id = c.playlist_id
         WHERE c.user_id = $1
       `,
@@ -76,7 +97,7 @@ class PlaylistsService {
     return resultCollaborations.rows.map((row) => ({
       id: row.id,
       name: row.name,
-      username: row.owner,
+      username: row.username,
     }));
   }
 
