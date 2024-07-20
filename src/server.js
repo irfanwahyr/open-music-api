@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
@@ -19,6 +20,10 @@ const collaborations = require('./api/collaborations');
 const CollaborationsService = require('./services/postgres/CollaborationsService');
 const CollaborationsValidator = require('./validator/collaborations');
 
+const _exports = require('./api/exports');
+const ExportsService = require('./services/postgres/ExportsService');
+const ExportsValidator = require('./validator/exports');
+
 const users = require('./api/users');
 const UsersService = require('./services/postgres/UsersService');
 const UsersValidator = require('./validator/users');
@@ -35,6 +40,7 @@ const init = async () => {
   const playlistsService = new PlaylistsService();
   const collaborationsService = new CollaborationsService();
   const authenticationsService = new AuthenticationsService();
+  const exportsService = new ExportsService();
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -111,6 +117,14 @@ const init = async () => {
       options: {
         service: collaborationsService,
         validator: CollaborationsValidator,
+      },
+    },
+    {
+      plugin: _exports,
+      options: {
+        service: exportsService,
+        validator: ExportsValidator,
+        playlistsService,
       },
     },
   ]);
