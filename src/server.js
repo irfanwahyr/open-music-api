@@ -2,6 +2,9 @@
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const path = require('path');
+const Inert = require('@hapi/inert');
+
 const ClientError = require('./exceptions/ClientError');
 
 const albums = require('./api/albums');
@@ -33,8 +36,11 @@ const AuthenticationsService = require('./services/postgres/AuthenticationsServi
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
+const CacheService = require('./services/redis/CacheService');
+
 const init = async () => {
-  const albumsService = new AlbumsService();
+  const cacheService = new CacheService();
+  const albumsService = new AlbumsService(cacheService);
   const songsService = new SongsService();
   const usersService = new UsersService();
   const playlistsService = new PlaylistsService();
@@ -55,6 +61,9 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt,
+    },
+    {
+      plugin: Inert,
     },
   ]);
 
@@ -79,6 +88,7 @@ const init = async () => {
       plugin: albums,
       options: {
         service: albumsService,
+        storagePath: path.resolve(__dirname, 'api/uploads/file/images'),
         validator: AlbumsValidator,
       },
     },
